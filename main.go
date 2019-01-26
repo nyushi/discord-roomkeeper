@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/k0kubun/pp"
@@ -33,6 +35,14 @@ func main() {
 		log.Fatalf("failed to open connection: %s", err)
 	}
 	defer dg.Close()
+
+	s := &http.Server{
+		Addr:           ":" + os.Getenv("PORT"),
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	log.Fatal(s.ListenAndServe())
 
 	log.Println("Start roomkeeper")
 	sc := make(chan os.Signal, 1)
